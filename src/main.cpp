@@ -1,6 +1,6 @@
 #include <iostream>
 #include "au_reading.h"
-// #include "signal.h"
+#include "signal.h"
 
 int main() {
     std::cout << "Hello, Embedded !" << std::endl;

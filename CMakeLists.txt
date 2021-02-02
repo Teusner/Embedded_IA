@@ -9,3 +9,4 @@ set(CMAKE_CXX_COMPILER "/usr/bin/g++-10")
 include_directories(./include)
 
 add_executable(start_svm src/main.cpp)
+target_link_libraries(start_svm tbb)
