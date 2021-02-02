@@ -1,6 +1,5 @@
 #ifndef START_SVM_SIGNAL_H
 #define START_SVM_SIGNAL_H
-
 #include <iostream>
 #include <iterator>
 #include <numbers>
