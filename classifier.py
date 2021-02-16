@@ -100,15 +100,17 @@ print(best_accuracy,best_parameters)
 score = grid_search.score(X_test, y_test)
 print(score)
  """
-from keras.optimizers import Adam,RMSprop
+""" from keras.optimizers import Adam,RMSprop
 import matplotlib.pyplot as pyplot
-
+from tensorflow.keras import initializers
 
 def fit_model(trainX, trainy, testX, testy, lrate):
+	kernel_initializer=initializers.RandomNormal(stddev=0.01)
+
 	# define model
 	model = Sequential()
-	model.add(Dense(512, input_dim=number_features, activation='relu', kernel_initializer='he_uniform'))
-	model.add(Dense(512, activation='relu', kernel_initializer='he_uniform'))
+	model.add(Dense(32, input_dim=number_features, activation='relu', kernel_initializer=kernel_initializer))
+	model.add(Dense(32, activation='relu', kernel_initializer=kernel_initializer))
 	model.add(Dense(10, activation='softmax'))
 	# compile model
 	opt = RMSprop(lr=lrate)
@@ -124,7 +126,7 @@ def fit_model(trainX, trainy, testX, testy, lrate):
 	pyplot.tight_layout()
 
 # create learning curves for different learning rates
-learning_rates = [1e-2, 1e-3, 1e-4, 1e-5]
+learning_rates = [1e-2, 1e-3, 1e-4]
 for i in range(len(learning_rates)):
 	# determine the plot number
 	plot_no = 220 + (i+1)
@@ -132,7 +134,7 @@ for i in range(len(learning_rates)):
 	# fit model and plot learning curves for a learning rate
 	fit_model(X_train, y_train, X_test, y_test, learning_rates[i])
 # show learning curves
-pyplot.show()
+pyplot.show() """
 
 
 
@@ -143,7 +145,7 @@ pyplot.show()
 
 
  #--------------------#Model SVM sklearn #--------------------
-""" 
+
 from sklearn import svm
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import cross_val_score
@@ -156,7 +158,7 @@ clf = GridSearchCV(
 scores = cross_val_score(clf, X_train, y_train, cv=5)
 print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
 
- """
+
 
 #-------------------Neural Network WITH SCIKIT LEARN ---------------------
 """ from sklearn.neural_network import MLPClassifier
