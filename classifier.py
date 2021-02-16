@@ -8,7 +8,7 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 
-PATH = 'Data/dataset1.csv'
+PATH = 'Data/dataset.csv'
 dataset = pd.read_csv(PATH,sep=';')
 columns = dataset.columns.tolist() # get the columns
 cols_to_use = columns[:len(columns)-1] # drop the last one

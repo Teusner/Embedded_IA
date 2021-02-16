@@ -44,33 +44,44 @@ int main() {
             //         csv << bins[i][j];
             // }
             
-            double spectrum[8192];
-            std::copy(data.begin(), data.end(), spectrum);
-            
-            fftw_complex in[N], out[N];
-            fftw_plan p;
+            // Writing class in csv
+            csv<<Class[k];
 
+            // Computing fft
             int N = data.size();
+            fftw_complex *in, *out;
+
+            in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
+            out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
+
+            fftw_plan p;
+            
+            //  Creating input signal
             for (int i = 0; i < N; i++) {
                 in[i][0] = data[i];
                 in[i][1] = 0;
             }
 
-            /* forward Fourier transform, save the result in 'out' */
+            // Computing output fft
             p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
             fftw_execute(p);
-            for (int i = 0; i < N; i++)
-                printf("freq: %3d %+9.5f %+9.5f I\n", i, out[i][0], out[i][1]);
-            fftw_destroy_plan(p);
 
-            csv<<Class[k];
+            //  Getting real part of the fft
+            double spectrum[N];
+            for (int i = 0; i < N; i++) {
+                spectrum[i] = out[i][0];
+            }
             
-            int i_max = 25;
-            for (int i = 0; i < i_max; i++){
-                double mfcc_result = GetCoefficient(spectrum, 44100, 48, 128, i);
+            // Computing MFCC coefficients from fft
+            int coeff_max = 25;
+            for (int coeff = 0; coeff < coeff_max; coeff++){
+                double mfcc_result = GetCoefficient(spectrum, 44100, 48, 128, coeff);
                 csv << mfcc_result;
             }
 
+            fftw_free(in);
+            fftw_free(out);
+            fftw_destroy_plan(p);
             csv << endrow;
         }
     }
