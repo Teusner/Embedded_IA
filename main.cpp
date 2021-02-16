@@ -17,7 +17,6 @@ using namespace std;
 int main() {
     /* creating all classes */
     std::vector<string> Class={ "blues" , "classical" , "country" , "disco" , "hiphop" , "jazz" , "metal" , "pop" , "reggae" , "rock"};
-    std::cout << Class[0] << std::endl;
 
     /* Opening file */
     std::ostringstream oss_w;
@@ -37,6 +36,17 @@ int main() {
         
     csv<<endrow;
 
+    // FFT creation
+    int N = 600000;
+    int fft_size = N;
+    fftw_complex *in, *out;
+
+    in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
+    out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * fft_size);
+
+    fftw_plan p;
+    p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+
     for (int k = 0; k < Class.size(); k++){
         for (int n = 0; n < 100; n++){
             std::ostringstream oss_r;
@@ -46,7 +56,7 @@ int main() {
                 oss_r << "../archive/genres/"<<Class[k]<<"/"<<Class[k]<<".000" << n << ".au" ;
         
             std::string path_read = oss_r.str();
-            std::cout << path_read << std::endl;
+            // std::cout << path_read << std::endl;
             
             /* extract features */
             DataVector data = readAuFile(path_read);
@@ -77,15 +87,6 @@ int main() {
             // Computing energy of the signal
             auto wenergy = std::transform_reduce(data.cbegin(), data.cend(), 0.0, std::plus<double>(), [](double x) { return std::norm(x); });
 
-            // Computing fft
-            int N = data.size();
-            fftw_complex *in, *out;
-
-            in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
-            out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
-
-            fftw_plan p;
-            
             //  Creating input signal
             for (int i = 0; i < N; i++) {
                 in[i][0] = data[i];
@@ -93,27 +94,25 @@ int main() {
             }
 
             // Computing output fft
-            p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
             fftw_execute(p);
 
             //  Getting real part of the fft
-            double spectrum[N];
-            for (int i = 0; i < N; i++) {
+            double spectrum[fft_size];
+            for (int i = 0; i < fft_size; i++) {
                 spectrum[i] = out[i][0];
             }
             
             // Computing MFCC coefficients from fft
             for (int coeff = 0; coeff < coeff_max; coeff++){
-                double mfcc_result = GetCoefficient(spectrum, 22050, 48, int(N/100), coeff);
+                double mfcc_result = GetCoefficient(spectrum, 22050, 48, int(fft_size/100), coeff);
                 csv << mfcc_result;
             }        
-
-            fftw_free(in);
-            fftw_free(out);
-            fftw_destroy_plan(p);
             csv << endrow;
         }
     }
+    fftw_free(in);
+    fftw_free(out);
+    fftw_destroy_plan(p);
     
     return 0;
 }
