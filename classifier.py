@@ -8,11 +8,13 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 
-PATH = 'Data/dataset.csv'
+PATH = 'Data/dataset1.csv'
 dataset = pd.read_csv(PATH,sep=';')
 columns = dataset.columns.tolist() # get the columns
 cols_to_use = columns[:len(columns)-1] # drop the last one
 dataset = pd.read_csv(PATH, usecols=cols_to_use,sep=";")
+
+number_features = 40
 
 print(dataset.shape)
 print(pd.unique(dataset["class"]).tolist()) 
@@ -105,24 +107,27 @@ import matplotlib.pyplot as pyplot
 def fit_model(trainX, trainy, testX, testy, lrate):
 	# define model
 	model = Sequential()
-	model.add(Dense(512, input_dim=100, activation='relu', kernel_initializer='he_uniform'))
+	model.add(Dense(512, input_dim=number_features, activation='relu', kernel_initializer='he_uniform'))
 	model.add(Dense(512, activation='relu', kernel_initializer='he_uniform'))
 	model.add(Dense(10, activation='softmax'))
 	# compile model
 	opt = RMSprop(lr=lrate)
 	model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 	# fit model
-	history = model.fit(trainX, trainy, validation_data=(testX, testy), epochs=150, verbose=1)
+	history = model.fit(trainX, trainy, validation_data=(testX, testy), epochs=300, verbose=1)
 	# plot learning curves
 	pyplot.plot(history.history['accuracy'], label='train')
 	pyplot.plot(history.history['val_accuracy'], label='test')
 	pyplot.title('lrate='+str(lrate), pad=-50)
+	pyplot.legend(loc="best")
+	pyplot.grid(True)
+	pyplot.tight_layout()
 
 # create learning curves for different learning rates
-learning_rates = [1E-4, 1E-5]
+learning_rates = [1e-2, 1e-3, 1e-4, 1e-5]
 for i in range(len(learning_rates)):
 	# determine the plot number
-	plot_no = 420 + (i+1)
+	plot_no = 220 + (i+1)
 	pyplot.subplot(plot_no)
 	# fit model and plot learning curves for a learning rate
 	fit_model(X_train, y_train, X_test, y_test, learning_rates[i])

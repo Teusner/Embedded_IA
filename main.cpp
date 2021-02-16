@@ -23,55 +23,31 @@ int main() {
     std::string path_write = oss_w.str();
     csvfile csv(path_write);
 
-
-
     /* Labelisation csv */
-    auto data = readAuFile("../label.au");
-    auto bins = fft_windowing_framing(data);
-    csv<<"class";
-    int count=0;
-    
-    for (int j = 0; j < 50*2; j++)
-        {   count+=1;
-            std::ostringstream oss_label;
-            oss_label << "feature"<<count ;
-            std::string label = oss_label.str();
-            csv<<label;
-        }
-            
+    csv<<"class";    
+    int coeff_max = 40;
+    for (int feature_number = 0; feature_number < coeff_max; feature_number++) {
+        std::ostringstream oss_label;
+        oss_label << "feature" << feature_number ;
+        std::string label = oss_label.str();
+        csv << label;
+    }
         
     csv<<endrow;
 
-    for (int k = 0; k < Class.size(); k++)
-    {
-        for (int n = 0; n < 100; n++)
-    {
-        std::ostringstream oss_r;
-        if (n<10)
-        {
-            oss_r << "../archive/genres/"<<Class[k]<<"/"<<Class[k]<<".0000" << n << ".au" ;
-        }
-        else
-        {
-            oss_r << "../archive/genres/"<<Class[k]<<"/"<<Class[k]<<".000" << n << ".au" ;
-        }
-        
-        std::string path_read = oss_r.str();
-        cout<<path_read<<endl;
+    for (int k = 0; k < Class.size(); k++){
+        for (int n = 0; n < 100; n++){
+            std::ostringstream oss_r;
+            if (n<10)
+                oss_r << "../archive/genres/"<<Class[k]<<"/"<<Class[k]<<".0000" << n << ".au" ;
+            else
+                oss_r << "../archive/genres/"<<Class[k]<<"/"<<Class[k]<<".000" << n << ".au" ;
         
             std::string path_read = oss_r.str();
             std::cout << path_read << std::endl;
             
             /* extract features */
             DataVector data = readAuFile(path_read);
-            // auto bins = fft_windowing_framing(data);
-
-            // /* creating csv file */
-            // csv<<Class[k];
-            // for (int i = 0; i < 10; i++) {
-            //     for (int j = 0; j < 10; j++)
-            //         csv << bins[i][j];
-            // }
             
             // Writing class in csv
             csv<<Class[k];
@@ -102,7 +78,6 @@ int main() {
             }
             
             // Computing MFCC coefficients from fft
-            int coeff_max = 25;
             for (int coeff = 0; coeff < coeff_max; coeff++){
                 double mfcc_result = GetCoefficient(spectrum, 44100, 48, 128, coeff);
                 csv << mfcc_result;
