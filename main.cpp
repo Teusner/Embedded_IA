@@ -1,6 +1,7 @@
 #include <iostream>
 #include "au_reading.h"
 #include "signal.h"
+#include <complex.h>    /* Standard Library of Complex Numbers */
 #include "csvfile.h"
 
 #include "mfcc.hpp"
@@ -16,19 +17,47 @@ int main() {
     std::vector<string> Class={ "blues" , "classical" , "country" , "disco" , "hiphop" , "jazz" , "metal" , "pop" , "reggae" , "rock"};
     std::cout << Class[0] << std::endl;
 
+    /* Opening file */
     std::ostringstream oss_w;
-    oss_w << "../Data/dataset.csv" ;
+    oss_w << "../Data/dataset1.csv" ;
     std::string path_write = oss_w.str();
     csvfile csv(path_write);
 
-    /* writing path */
-    for (int k = 0; k < Class.size(); k++) {
-        for (int n = 0; n < 100; n++) {
-            std::ostringstream oss_r;
-            if (n<10)
-                oss_r << "../archive/genres/"<<Class[k]<<"/"<<Class[k]<<".0000" << n << ".au" ;
-            else
-                oss_r << "../archive/genres/"<<Class[k]<<"/"<<Class[k]<<".000" << n << ".au" ;
+
+
+    /* Labelisation csv */
+    auto data = readAuFile("../label.au");
+    auto bins = fft_windowing_framing(data);
+    csv<<"class";
+    int count=0;
+    
+    for (int j = 0; j < 50*2; j++)
+        {   count+=1;
+            std::ostringstream oss_label;
+            oss_label << "feature"<<count ;
+            std::string label = oss_label.str();
+            csv<<label;
+        }
+            
+        
+    csv<<endrow;
+
+    for (int k = 0; k < Class.size(); k++)
+    {
+        for (int n = 0; n < 100; n++)
+    {
+        std::ostringstream oss_r;
+        if (n<10)
+        {
+            oss_r << "../archive/genres/"<<Class[k]<<"/"<<Class[k]<<".0000" << n << ".au" ;
+        }
+        else
+        {
+            oss_r << "../archive/genres/"<<Class[k]<<"/"<<Class[k]<<".000" << n << ".au" ;
+        }
+        
+        std::string path_read = oss_r.str();
+        cout<<path_read<<endl;
         
             std::string path_read = oss_r.str();
             std::cout << path_read << std::endl;
@@ -77,7 +106,7 @@ int main() {
             for (int coeff = 0; coeff < coeff_max; coeff++){
                 double mfcc_result = GetCoefficient(spectrum, 44100, 48, 128, coeff);
                 csv << mfcc_result;
-            }
+            }        
 
             fftw_free(in);
             fftw_free(out);
