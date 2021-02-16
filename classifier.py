@@ -33,9 +33,9 @@ label_names_unique = label_names.unique()
 y = tf.keras.utils.to_categorical(label_one) """
 
 ohe = LabelEncoder()
-ohe.fit(label_names)
+ohe.fit(label_names_unique)
 y=ohe.transform(label_names)
-y = tf.keras.utils.to_categorical(y)
+# y = tf.keras.utils.to_categorical(y)
 
 print(y.shape)
 

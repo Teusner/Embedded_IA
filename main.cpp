@@ -25,7 +25,7 @@ int main() {
 
     /* Labelisation csv */
     csv<<"class";    
-    int coeff_max = 40;
+    int coeff_max = 19;
     for (int feature_number = 0; feature_number < coeff_max; feature_number++) {
         std::ostringstream oss_label;
         oss_label << "feature" << feature_number ;
@@ -79,7 +79,7 @@ int main() {
             
             // Computing MFCC coefficients from fft
             for (int coeff = 0; coeff < coeff_max; coeff++){
-                double mfcc_result = GetCoefficient(spectrum, 44100, 48, 128, coeff);
+                double mfcc_result = GetCoefficient(spectrum, 22050, 19, 128, coeff);
                 csv << mfcc_result;
             }        
 
