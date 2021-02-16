@@ -7,7 +7,9 @@
 #include "mfcc.hpp"
 #include <vector>
 #include <fftw3.h>
-
+#include <algorithm>
+#include <functional>
+#include <numeric>
 
 using namespace std;
 
@@ -26,7 +28,7 @@ int main() {
     /* Labelisation csv */
     csv<<"class";    
     int coeff_max = 19;
-    for (int feature_number = 0; feature_number < coeff_max; feature_number++) {
+    for (int feature_number = 0; feature_number < coeff_max+3; feature_number++) {
         std::ostringstream oss_label;
         oss_label << "feature" << feature_number ;
         std::string label = oss_label.str();
@@ -50,7 +52,30 @@ int main() {
             DataVector data = readAuFile(path_read);
             
             // Writing class in csv
-            csv<<Class[k];
+            csv << Class[k];
+
+            // Computing mean
+            double mean = 0.0;
+            mean = std::accumulate(data.begin(), data.end(), 0.0);
+            mean = mean / data.size();
+            csv << mean;
+
+            // Computing std
+            double stdev = 0.0;
+            stdev = std::transform_reduce(data.cbegin(), data.cend(), 0.0, std::plus<double>(), [=](double x) { return std::pow((x - mean), 2); });
+            stdev = std::sqrt(stdev / data.size());
+            csv << stdev;
+
+            // Computing Cross-Zero Rate
+            double czr = 0.0;
+            DataVector result(data.size());
+            auto c = std::transform(data.begin()+1, data.end(), data.begin(), result.begin(), std::multiplies<int>());
+            czr = std::count_if(result.cbegin(), result.cend(), [](double i) { return i < 0 ; }); 
+            czr = czr / data.size();
+            csv << czr;
+
+            // Computing energy of the signal
+            auto wenergy = std::transform_reduce(data.cbegin(), data.cend(), 0.0, std::plus<double>(), [](double x) { return std::norm(x); });
 
             // Computing fft
             int N = data.size();
@@ -79,7 +104,7 @@ int main() {
             
             // Computing MFCC coefficients from fft
             for (int coeff = 0; coeff < coeff_max; coeff++){
-                double mfcc_result = GetCoefficient(spectrum, 22050, 19, 128, coeff);
+                double mfcc_result = GetCoefficient(spectrum, 22050, 48, int(N/100), coeff);
                 csv << mfcc_result;
             }        
 
