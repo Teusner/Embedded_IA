@@ -1,0 +1,8 @@
+version: "3.3"
+
+services:
+  cross-compiler:
+    image: olivierreynet/cc-debian-sid:latest
+    volumes:
+      - ./:/data
+    entrypoint: tail -F anything # ["/data/compile.sh"]

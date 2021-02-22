@@ -18,7 +18,7 @@ int main() {
     csvfile csv(path_write);
 
     /* writing path */
-    for (int k = 0; k < Class.size(); k++) {
+    for (int k = 0; k < int(Class.size()); k++) {
         for (int n = 0; n < 100; n++) {
             std::ostringstream oss_r;
             if (n<10)
